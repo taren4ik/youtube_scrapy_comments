@@ -1,3 +1,4 @@
+import datetime
 import os
 
 import dotenv
@@ -14,12 +15,21 @@ comments_list = []
 
 
 class ScrapyComments:
+    """
+    Scrapes youtube comments and checks whether a user  commented on the
+    given videos.
+    """
     def __init__(self, api_key, video_id):
         self.api_key = api_key
         self.video_id = video_id
         self.connection = build('youtube', 'v3', developerKey=self.api_key)
 
     def collect_comments(self, resp):
+        """
+        Reade comment and answer from response.
+        :param resp:
+        :return:
+        """
         for item in tqdm(resp['items']):
             name = item["snippet"]['topLevelComment']["snippet"][
                 "authorDisplayName"]
@@ -64,15 +74,15 @@ class ScrapyComments:
                            'Date': [i[2] for i in comments_list],
                            'Likes': [i[3] for i in comments_list],
                            'Reply Count': [i[4] for i in comments_list]})
-
+        date = datetime.date.today().__str__().replace("-", "_")
         df.to_csv(
-            f"{VIDEO_ID}.csv",
+            f"{VIDEO_ID}_{date}.csv",
             mode="a", sep=";",
             header=True,
             index=False,
             encoding="utf-16"
         )
-        return "Successful!Check the CSV file  created."
+        return "Successful! Check the CSV file  created."
 
     def get_comments(self):
         """
