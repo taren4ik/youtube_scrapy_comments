@@ -1,10 +1,9 @@
 import os
 
 import dotenv
-from googleapiclient.discovery import build
 import pandas as pd
+from googleapiclient.discovery import build
 from tqdm import tqdm
-
 
 dotenv.load_dotenv()
 
@@ -31,7 +30,7 @@ class ScrapyComments:
             likes = item["snippet"]['topLevelComment']["snippet"]['likeCount']
             replies = item["snippet"]['totalReplyCount']
             if [name, comment, published_at, likes,
-                replies] not in comments_list:
+                    replies] not in comments_list:
                 comments_list.append(
                     [name, comment, published_at, likes, replies])
 
@@ -44,7 +43,6 @@ class ScrapyComments:
                     parentId=parent,
                     textFormat="plainText").execute()
 
-
                 for i in response_2["items"]:
                     name = i["snippet"]["authorDisplayName"]
                     comment = i["snippet"]["textDisplay"]
@@ -52,7 +50,7 @@ class ScrapyComments:
                     likes = i["snippet"]['likeCount']
                     replies = ""
                     if [name, comment, published_at, likes,
-                        replies] not in comments_list:
+                            replies] not in comments_list:
                         comments_list.append(
                             [name, comment, published_at, likes, replies])
 
@@ -63,7 +61,7 @@ class ScrapyComments:
         """
         df = pd.DataFrame({'Name': [i[0] for i in comments_list],
                            'Comment': [i[1] for i in comments_list],
-                           'Time': [i[2] for i in comments_list],
+                           'Date': [i[2] for i in comments_list],
                            'Likes': [i[3] for i in comments_list],
                            'Reply Count': [i[4] for i in comments_list]})
 
@@ -90,8 +88,7 @@ class ScrapyComments:
                 pageToken=response["nextPageToken"]).execute()
             self.collect_comments(response)
 
- #       self.save_to_csv()
-        print('Count  comments:  ', len(comments_list))
+        print('Count  comments: ', len(comments_list))
 
 
 if __name__ == "__main__":
